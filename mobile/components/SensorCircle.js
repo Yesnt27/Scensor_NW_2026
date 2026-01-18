@@ -11,35 +11,35 @@ import { STATE_TYPES } from '../hooks/useAlertState';
 export default function SensorCircle({ state = STATE_TYPES.NORMAL }) {
     const isDetecting = state === STATE_TYPES.DETECTING;
     const isAlert = state === STATE_TYPES.ALERT;
-
-    // Animated values
+    
+    // Animated values - KEEP CONSISTENT useNativeDriver
     const breatheAnim = useRef(new Animated.Value(1)).current;
-    const glowAnim = useRef(new Animated.Value(20)).current;
+    const glowAnim = useRef(new Animated.Value(20)).current; // ✅ This stays non-native
     const glowOpacityAnim = useRef(new Animated.Value(0.6)).current;
-
+    
     useEffect(() => {
-        // Continuous breathing animation (5 second cycle - slower)
+        // Continuous breathing animation (5 second cycle)
         const breathAnimation = Animated.loop(
             Animated.sequence([
                 // Inhale - expand
                 Animated.parallel([
                     Animated.timing(breatheAnim, {
-                        toValue: 1.15, // Increased from 1.05 to 1.15 (115% scale)
+                        toValue: 1.15,
                         duration: 2500,
                         easing: Easing.inOut(Easing.ease),
-                        useNativeDriver: true,
+                        useNativeDriver: true, // ✅ Native (transform only)
                     }),
                     Animated.timing(glowAnim, {
-                        toValue: 50, // Increased from 35 to 50
+                        toValue: 50,
                         duration: 2500,
                         easing: Easing.inOut(Easing.ease),
-                        useNativeDriver: false,
+                        useNativeDriver: false, // ✅ Non-native (shadowRadius can't use native)
                     }),
                     Animated.timing(glowOpacityAnim, {
-                        toValue: 0.9, // Increased from 0.8 to 0.9
+                        toValue: 0.9,
                         duration: 2500,
                         easing: Easing.inOut(Easing.ease),
-                        useNativeDriver: true,
+                        useNativeDriver: true, // ✅ Native (opacity)
                     }),
                 ]),
                 // Exhale - contract
@@ -48,31 +48,31 @@ export default function SensorCircle({ state = STATE_TYPES.NORMAL }) {
                         toValue: 1,
                         duration: 2500,
                         easing: Easing.inOut(Easing.ease),
-                        useNativeDriver: true,
+                        useNativeDriver: true, // ✅ Native
                     }),
                     Animated.timing(glowAnim, {
                         toValue: 20,
                         duration: 2500,
                         easing: Easing.inOut(Easing.ease),
-                        useNativeDriver: false,
+                        useNativeDriver: false, // ✅ Non-native
                     }),
                     Animated.timing(glowOpacityAnim, {
                         toValue: 0.6,
                         duration: 2500,
                         easing: Easing.inOut(Easing.ease),
-                        useNativeDriver: true,
+                        useNativeDriver: true, // ✅ Native
                     }),
                 ]),
             ])
         );
-
+        
         breathAnimation.start();
-
+        
         return () => {
             breathAnimation.stop();
         };
     }, [breatheAnim, glowAnim, glowOpacityAnim]);
-
+    
     // Determine colors based on state
     let outerColor, innerColor, glowColor;
     
@@ -89,10 +89,10 @@ export default function SensorCircle({ state = STATE_TYPES.NORMAL }) {
         innerColor = '#00FF88';
         glowColor = '#00FF88';
     }
-
+    
     return (
         <View style={styles.container}>
-            {/* Outer glow */}
+            {/* Outer glow - uses NON-NATIVE animated value */}
             <Animated.View
                 style={[
                     styles.glow,
@@ -103,13 +103,14 @@ export default function SensorCircle({ state = STATE_TYPES.NORMAL }) {
                         backgroundColor: glowColor,
                         opacity: glowOpacityAnim,
                         shadowColor: glowColor,
-                        shadowRadius: glowAnim,
+                        shadowOffset: { width: 0, height: 0 },
+                        shadowRadius: glowAnim, // ✅ Non-native driver (shadowRadius not supported)
                         shadowOpacity: 1,
-                        transform: [{ scale: breatheAnim }],
+                        transform: [{ scale: breatheAnim }], // ✅ Native driver
                     },
                 ]}
             />
-
+            
             {/* Main breathing circle */}
             <Animated.View
                 style={[
@@ -148,7 +149,6 @@ const styles = StyleSheet.create({
     glow: {
         position: 'absolute',
         elevation: 0,
-        shadowOffset: { width: 0, height: 0 },
     },
     outerCircle: {
         alignItems: 'center',
