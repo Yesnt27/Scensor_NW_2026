@@ -69,3 +69,17 @@ mobile/
 ## ESP32 Integration
 
 Your ESP32 can write directly to Firebase using the Firebase REST API or Firebase SDK. No Node.js server required!
+To run the vocUpload code you need to have a esp32, and an sgp40. 
+To run the code you will need a config.h defined with the following:
+
+```
+#ifndef CONFIG_H
+#define CONFIG_H
+
+#define WIFI_SSID "wifi name"
+#define WIFI_PASSWORD "wifi name"
+#define FIREBASE_HOST "firebase host name"
+#define FIREBASE_AUTH "firebase secret"
+
+#endif
+``` 
