@@ -1,42 +1,32 @@
-import React, { useState, useEffect } from 'react';
+/**
+ * SensorScreen Component
+ * Main screen displaying sensor data with real-time updates
+ * 
+ * Responsibilities:
+ * - Display sensor value and unit
+ * - Show alert state (red/green)
+ * - Handle button interactions
+ */
+
+import React from 'react';
 import { View, Text } from 'react-native';
-import { database } from '../config/firebase';
-import { ref, onValue } from 'firebase/database';
 import { sensorScreenStyles } from '../styles/sensorScreenStyles';
-import { LAYOUT_CONFIG } from '../config/layout';
+import { useSensorData, useAlertState } from '../hooks';
 import SensorCircle from './SensorCircle';
 import CloudButton from './CloudButton';
 import BottomGradient from './BottomGradient';
 
 export default function SensorScreen() {
-    const [sensorValue, setSensorValue] = useState(81);
-    const [unit, setUnit] = useState('ppi');
+    // Fetch sensor data from Firebase
+    const { sensorValue, unit, isLoading, error } = useSensorData();
 
-    useEffect(() => {
-        const sensorRef = ref(database, 'sensor/value');
+    // Manage alert state based on sensor value and button press
+    const { isAlert, toggleAlert } = useAlertState(sensorValue);
 
-        const unsubscribe = onValue(sensorRef, (snapshot) => {
-            if (snapshot.exists()) {
-                const value = snapshot.val();
-                if (typeof value === 'number') {
-                    setSensorValue(Math.round(value));
-                } else if (value && typeof value === 'object' && value.value !== undefined) {
-                    setSensorValue(Math.round(value.value));
-                    if (value.unit) {
-                        setUnit(value.unit);
-                    }
-                } else if (!isNaN(parseFloat(value))) {
-                    setSensorValue(Math.round(parseFloat(value)));
-                }
-            }
-        }, (error) => {
-            console.error('Firebase error:', error);
-        });
-
-        return () => unsubscribe();
-    }, []);
-
-    const isAlert = sensorValue >= LAYOUT_CONFIG.circle.threshold;
+    // Show loading or error states if needed
+    if (error) {
+        console.warn('Sensor data error:', error);
+    }
 
     return (
         <View style={sensorScreenStyles.container}>
@@ -49,8 +39,8 @@ export default function SensorScreen() {
                 </Text>
             </View>
 
-            <BottomGradient />
-            <CloudButton />
+            <BottomGradient isAlert={isAlert} />
+            <CloudButton onPress={toggleAlert} />
         </View>
     );
 }

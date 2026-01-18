@@ -1,3 +1,12 @@
+/**
+ * CloudButton Component
+ * Reusable button component with cloud icon
+ * 
+ * Props:
+ *   - onPress: Function to call when button is pressed
+ */
+
+import React from 'react';
 import { TouchableOpacity, View, Text } from 'react-native';
 import { cloudButtonStyles } from '../styles/cloudButtonStyles';
 
