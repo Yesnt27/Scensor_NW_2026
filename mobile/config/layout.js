@@ -16,6 +16,8 @@ export const LAYOUT_CONFIG = {
     circle: {
         size: 225,
         innerSize: 165,
+        detectingSize: 180, // Smaller size for detecting state
+        detectingInnerSize: 130, // Smaller inner size for detecting state
         threshold: 980000,
         normalColor: '#00DF82',
         alertColor: '#980000',

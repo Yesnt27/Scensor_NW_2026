@@ -16,7 +16,7 @@ export const sensorScreenStyles = StyleSheet.create({
         color: '#FFFFFF',
         fontSize: LAYOUT_CONFIG.title.fontSize,
         fontWeight: '600',
-        marginBottom: 40,
+        marginBottom: 30,
         alignSelf: 'flex-start',
         marginLeft: 20,
     },
@@ -25,13 +25,21 @@ export const sensorScreenStyles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         width: '100%',
+        marginTop: -40, // Move circles up
+    },
+    circleWrapper: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
     },
     sensorValue: {
         fontFamily: FONT_FAMILY,
         color: '#FFFFFF',
         fontSize: LAYOUT_CONFIG.sensorValue.fontSize,
         fontWeight: '500',
-        marginTop: LAYOUT_CONFIG.sensorValue.marginTop,
+        position: 'absolute',
+        bottom: 200, // Moved up from 150
+        alignSelf: 'center',
     },
 });
 

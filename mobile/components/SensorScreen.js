@@ -12,9 +12,11 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { sensorScreenStyles } from '../styles/sensorScreenStyles';
 import { useSensorData, useAlertState, STATE_TYPES } from '../hooks';
+import { LAYOUT_CONFIG } from '../config/layout';
 import SensorCircle from './SensorCircle';
 import CloudButton from './CloudButton';
 import BottomGradient from './BottomGradient';
+import ParticleEffect from './ParticleEffect';
 
 export default function SensorScreen() {
     // Fetch sensor data from Firebase
@@ -31,15 +33,23 @@ export default function SensorScreen() {
 
     // Display text based on state
     const displayText = state === STATE_TYPES.DETECTING
-        ? 'detecting...'
+        ? 'Detecting...'
         : `${sensorValue} ${unit}`;
+
+    const isDetecting = state === STATE_TYPES.DETECTING;
+    const circleSize = isDetecting
+        ? LAYOUT_CONFIG.circle.detectingSize
+        : LAYOUT_CONFIG.circle.size;
 
     return (
         <View style={sensorScreenStyles.container}>
             <Text style={sensorScreenStyles.title}>Scensor</Text>
 
             <View style={sensorScreenStyles.sensorContainer}>
-                <SensorCircle state={state} />
+                <View style={sensorScreenStyles.circleWrapper}>
+                    <SensorCircle state={state} />
+                    <ParticleEffect isActive={isDetecting} circleSize={circleSize} />
+                </View>
                 <Text style={sensorScreenStyles.sensorValue}>
                     {displayText}
                 </Text>
