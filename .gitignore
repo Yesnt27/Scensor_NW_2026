@@ -44,3 +44,5 @@ mobile/.expo-shared/
 mobile/config/firebase.local.js
 mobile/config/firebase.js
 
+# sgp40 arduino stuff
+vocUpload/config.h
