@@ -6,6 +6,11 @@ node_modules/
 .expo-shared/
 dist/
 
+# Environment variables (contains sensitive keys)
+.env
+.env.local
+.env.*.local
+
 # Firebase config (contains sensitive keys)
 config/firebase.local.js
 
