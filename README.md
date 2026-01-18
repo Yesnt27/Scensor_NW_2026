@@ -82,4 +82,6 @@ To run the code you will need a config.h defined with the following:
 #define FIREBASE_AUTH "firebase secret"
 
 #endif
-``` 
+```
+
+This file will need to be in the vocUpload Folder
