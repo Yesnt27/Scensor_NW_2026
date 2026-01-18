@@ -4,11 +4,11 @@
  * 
  * Logic:
  * - VOC Index > 250: Alert state (red)
- * - VOC Index = 0: Detecting state (white, pulsing)
+ * - VOC Index = null or 0: Detecting state (white, pulsing)
  * - VOC Index < 250 and > 0: Normal state (green)
  * 
  * Usage:
- *   const { state, toggleState } = useAlertState(vocIndex);
+ *   const { state } = useAlertState(vocIndex);
  */
 
 import { useMemo } from 'react';
@@ -23,8 +23,9 @@ export const STATE_TYPES = {
 export function useAlertState(vocIndex) {
     // Determine current state based purely on VOC index
     const state = useMemo(() => {
-        if (vocIndex === 0) {
-            return STATE_TYPES.DETECTING;  // Sensor initializing or no reading
+        // Null or 0 means sensor is calibrating/no reading yet
+        if (vocIndex === null || vocIndex === 0) {
+            return STATE_TYPES.DETECTING;
         } else if (vocIndex > 250) {
             return STATE_TYPES.ALERT;  // High VOC detected
         } else {
@@ -32,16 +33,9 @@ export function useAlertState(vocIndex) {
         }
     }, [vocIndex]);
     
-    // Button function (currently does nothing, but kept for compatibility)
-    const toggleState = () => {
-        // No-op: state is now purely determined by VOC index
-        console.log('Button pressed - state is auto-determined by VOC index');
-    };
-    
     return {
         state,
         isAlert: state === STATE_TYPES.ALERT,
         isDetecting: state === STATE_TYPES.DETECTING,
-        toggleState,  // Keep this so the button doesn't break
     };
 }

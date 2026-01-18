@@ -1,30 +1,22 @@
 /**
  * SensorScreen Component
  * Main screen displaying sensor data with real-time updates
- * 
- * Responsibilities:
- * - Display sensor value and unit
- * - Show alert state (red/green)
- * - Handle button interactions
  */
 
 import React from 'react';
 import { View, Text } from 'react-native';
 import { sensorScreenStyles } from '../styles/sensorScreenStyles';
-import { useSensorData, useAlertState, STATE_TYPES } from '../hooks';
+import { useSensorContext } from '../contexts/SensorContext';
+import { STATE_TYPES } from '../hooks/useAlertState';
 import { LAYOUT_CONFIG } from '../config/layout';
 import SensorCircle from './SensorCircle';
 import CloudButton from './CloudButton';
 import BottomGradient from './BottomGradient';
 import ParticleEffect from './ParticleEffect';
 
-export default function SensorScreen() {
-    // Fetch sensor data from Firebase
-    const { vocIndex, rawValue, isLoading, error } = useSensorData();
-    
-    // Manage state based on sensor value and button press
-    // Use VOC index for alert logic
-    const { state, toggleState } = useAlertState(vocIndex);
+export default function SensorScreen({ onShowTrends }) {
+    // Use shared context instead of calling hooks directly
+    const { vocIndex, rawValue, state, isLoading, error } = useSensorContext();
     
     // Show loading or error states if needed
     if (error) {
@@ -32,6 +24,7 @@ export default function SensorScreen() {
     }
     
     // Display text based on state
+    // If vocIndex or rawValue is null, state will be DETECTING
     const displayText = state === STATE_TYPES.DETECTING
         ? 'Detecting...'
         : `VOC: ${vocIndex} | Raw: ${rawValue}`;
@@ -56,7 +49,7 @@ export default function SensorScreen() {
             </View>
             
             <BottomGradient state={state} />
-            <CloudButton onPress={toggleState} />
+            <CloudButton onPress={onShowTrends} />
         </View>
     );
 }

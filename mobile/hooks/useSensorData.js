@@ -9,11 +9,10 @@
 import { useState, useEffect } from 'react';
 import { database } from '../config/firebase';
 import { ref, onValue } from 'firebase/database';
-import { DEFAULT_VALUES } from '../utils/constants';
 
 export function useSensorData() {
-    const [vocIndex, setVocIndex] = useState(DEFAULT_VALUES.VOC_INDEX);
-    const [rawValue, setRawValue] = useState(DEFAULT_VALUES.RAW_VALUE);
+    const [vocIndex, setVocIndex] = useState(null);
+    const [rawValue, setRawValue] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -33,12 +32,13 @@ export function useSensorData() {
                     const entries = Object.entries(data);
                     const latest = entries[entries.length - 1][1];
                     
-                    // Set both VOC index and raw value
-                    setVocIndex(latest.voc_index || DEFAULT_VALUES.VOC_INDEX);
-                    setRawValue(latest.raw || DEFAULT_VALUES.RAW_VALUE);
+                    // Set both VOC index and raw value (null if not present)
+                    setVocIndex(latest.voc_index ?? null);
+                    setRawValue(latest.raw ?? null);
                 } else {
-                    setVocIndex(DEFAULT_VALUES.VOC_INDEX);
-                    setRawValue(DEFAULT_VALUES.RAW_VALUE);
+                    // No data in Firebase
+                    setVocIndex(null);
+                    setRawValue(null);
                 }
             },
             (firebaseError) => {

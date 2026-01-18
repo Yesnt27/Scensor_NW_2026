@@ -9,11 +9,11 @@ export const FIREBASE_PATHS = {
     DEVICES: 'devices',
 };
 
-// Default Values
+// Default Values - null means calibrating/detecting state
 export const DEFAULT_VALUES = {
-    VOC_INDEX: 100,
-    RAW_VALUE: 30000,
-    SENSOR_VALUE: 100,  // Keep for backward compatibility
+    VOC_INDEX: null,
+    RAW_VALUE: null,
+    SENSOR_VALUE: null,
     UNIT: 'VOC Index',
 };
 

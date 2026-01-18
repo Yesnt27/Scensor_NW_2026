@@ -5,4 +5,4 @@
 
 export { useSensorData } from './useSensorData';
 export { useAlertState, STATE_TYPES } from './useAlertState';
-
+export { useSensorHistory } from './useSensorHistory';
