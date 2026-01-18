@@ -15,7 +15,7 @@ import firebaseResetService from '../services/firebaseResetService';
 export default function SensorScreen({ onShowTrends }) {
     // Get responsive dimensions (updates on screen size change)
     const { isDesktop } = useDimensions();
-    
+
     // Get responsive styles based on screen size
     const sensorScreenStyles = getSensorScreenStyles(isDesktop);
     
@@ -152,7 +152,6 @@ export default function SensorScreen({ onShowTrends }) {
     return (
         <View style={sensorScreenStyles.container}>
             <BottomGradient state={state} />
-
             {/* ✅ Alert Banner */}
             {showAlert && (
                 <Animated.View
