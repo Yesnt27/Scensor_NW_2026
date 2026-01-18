@@ -21,11 +21,11 @@ export default function SensorScreen({ onShowTrends }) {
     const sensorScreenStyles = getSensorScreenStyles(isDesktop);
     
     const { vocIndex, rawValue, state, isLoading, error } = useSensorContext();
-    
+
     const [rawValueHistory, setRawValueHistory] = useState([]);
     const previousRawValue = useRef(rawValue);
     const MAX_HISTORY = 4;
-    
+
     useEffect(() => {
         if (rawValue !== previousRawValue.current) {
             setRawValueHistory(prev => {
@@ -35,13 +35,13 @@ export default function SensorScreen({ onShowTrends }) {
             previousRawValue.current = rawValue;
         }
     }, [rawValue]);
-    
+
     const handleReset = () => {
         if (Platform.OS === 'web') {
             const confirmed = window.confirm(
                 "Are you sure you want to clear all sensor data? This action cannot be undone."
             );
-            
+
             if (confirmed) {
                 (async () => {
                     try {
@@ -91,28 +91,28 @@ export default function SensorScreen({ onShowTrends }) {
             );
         }
     };
-    
+
     if (error) {
         console.warn('Sensor data error:', error);
     }
-    
+
     const isDetecting = state === STATE_TYPES.DETECTING;
     const circleSize = isDetecting
         ? LAYOUT_CONFIG.circle.detectingSize
         : LAYOUT_CONFIG.circle.size;
-    
+
     const formatRawValue = (value) => {
         return `${String(value).padStart(5, '0')} ppi`;
     };
-    
+
     const formatVOC = (value) => {
         return `${value} VOC`;
     };
-    
+
     const getOpacity = (index) => {
         return 1.0 - (index * 0.2);
     };
-    
+
     const displayValues = [];
     for (let i = 0; i < MAX_HISTORY; i++) {
         if (i < rawValueHistory.length) {
@@ -122,29 +122,29 @@ export default function SensorScreen({ onShowTrends }) {
         }
     }
 
-    const particleColor = state === STATE_TYPES.ALERT 
+    const particleColor = state === STATE_TYPES.ALERT
         ? '#FF0000'
         : state === STATE_TYPES.DETECTING
-        ? '#FFFFFF'
-        : '#00FF88';
+            ? '#FFFFFF'
+            : '#00FF88';
 
     return (
         <View style={sensorScreenStyles.container}>
             <BottomGradient state={state} />
-            
-            <Text style={sensorScreenStyles.title}>Scensor</Text>
-            
+
+            <Text style={sensorScreenStyles.title} className="text-white">Scensor</Text>
+
             <View style={sensorScreenStyles.sensorContainer}>
                 <View style={sensorScreenStyles.circleWrapper}>
                     <SensorCircle state={state} />
-                    <ParticleEffect 
+                    <ParticleEffect
                         isActive={true}
                         circleSize={circleSize}
                         color={particleColor}
                     />
                 </View>
             </View>
-            
+
             {isDetecting ? (
                 <View style={sensorScreenStyles.detectingContainer}>
                     <Text style={sensorScreenStyles.detectingText}>Detecting...</Text>
@@ -153,7 +153,7 @@ export default function SensorScreen({ onShowTrends }) {
                 <View style={sensorScreenStyles.bottomValuesContainer}>
                     <View style={sensorScreenStyles.leftValuesContainer}>
                         {displayValues.map((value, index) => (
-                            <Text 
+                            <Text
                                 key={index}
                                 style={[
                                     sensorScreenStyles.rawValue,
@@ -165,7 +165,7 @@ export default function SensorScreen({ onShowTrends }) {
                             </Text>
                         ))}
                     </View>
-                    
+
                     <View style={sensorScreenStyles.rightValueContainer}>
                         <Text style={sensorScreenStyles.vocValue}>{formatVOC(vocIndex)}</Text>
                     </View>

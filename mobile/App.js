@@ -1,3 +1,4 @@
+import './global.css';
 import React, { useEffect, useState, useRef } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { View, Animated, Dimensions } from 'react-native';
@@ -77,7 +78,7 @@ export default function App() {
             <SensorProvider>
                 <View style={appStyles.container}>
                     <StatusBar style="light" />
-                    
+
                     <GestureDetector gesture={gesture}>
                         <Animated.View
                             style={[
