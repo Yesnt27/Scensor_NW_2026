@@ -1,5 +1,14 @@
 # Scensor_NW_2026
 
+***How this works***
+
+1. **ESP32** sends sensor readings (just a number) → **Node.js WebSocket Server** → **Firebase**
+2. **Website/Mobile App** reads from Firebase and displays the data
+3. **Abnormality Detection:**
+   - System collects first 10 readings to learn what "normal" is (establishes baseline average)
+   - After baseline is established, detects when new readings deviate >20% from the average
+   - Shows alerts when abnormalities are detected
+
 ## 📦 What to Download/Install (Mac)
 
 ### 1. Node.js (Required)

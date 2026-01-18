@@ -2,6 +2,7 @@
 
 import { initializeApp } from 'firebase/app';
 import { getDatabase } from 'firebase/database';
+import { getAuth } from 'firebase/auth';
 
 // Firebase Configuration
 const firebaseConfig = {
@@ -21,11 +22,12 @@ let database;
 try {
     app = initializeApp(firebaseConfig);
     database = getDatabase(app);
+    const auth = getAuth(app);
     console.log('Firebase initialized successfully');
 } catch (error) {
     console.error('Firebase initialization error:', error);
 }
 
-export { database };
+export { database, auth };
 export default app;
 
