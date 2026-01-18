@@ -8,11 +8,11 @@
  */
 
 import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Animated, Easing } from 'react-native';
+import { View, StyleSheet, Animated, Easing, Image } from 'react-native';
 import { LAYOUT_CONFIG } from '../config/layout';
 import { STATE_TYPES } from '../hooks/useAlertState';
 
-export default function SensorCircle({ state = STATE_TYPES.NORMAL }) {
+export default function SensorCircle({ state = STATE_TYPES.NORMAL, useImages = false }) {
     const isDetecting = state === STATE_TYPES.DETECTING;
     const isAlert = state === STATE_TYPES.ALERT;
 
@@ -102,6 +102,16 @@ export default function SensorCircle({ state = STATE_TYPES.NORMAL }) {
         ? Animated.multiply(innerSizeAnim, pulseAnim)
         : innerSizeAnim;
 
+    // Determine which image to show when useImages is true
+    let imageSource = null;
+    if (useImages && !isDetecting) {
+        if (isAlert) {
+            imageSource = require('../assets/images/yes_smile.png');
+        } else {
+            imageSource = require('../assets/images/no_smell.png');
+        }
+    }
+
     return (
         <Animated.View style={[
             styles.outerCircle,
@@ -112,15 +122,36 @@ export default function SensorCircle({ state = STATE_TYPES.NORMAL }) {
                 borderRadius: Animated.divide(animatedOuterSize, 2),
             }
         ]}>
-            <Animated.View style={[
-                styles.innerCircle,
-                {
-                    backgroundColor: innerColor,
-                    width: animatedInnerSize,
-                    height: animatedInnerSize,
-                    borderRadius: Animated.divide(animatedInnerSize, 2),
-                }
-            ]} />
+            {useImages && imageSource ? (
+                <Animated.View style={[
+                    styles.innerCircle,
+                    {
+                        width: Animated.multiply(animatedInnerSize, 1.8),
+                        height: Animated.multiply(animatedInnerSize, 1.8),
+                        borderRadius: Animated.divide(Animated.multiply(animatedInnerSize, 1.3), 2),
+                        overflow: 'hidden',
+                    }
+                ]}>
+                    <Image
+                        source={imageSource}
+                        style={{
+                            width: '100%',
+                            height: '100%',
+                            resizeMode: 'cover',
+                        }}
+                    />
+                </Animated.View>
+            ) : (
+                <Animated.View style={[
+                    styles.innerCircle,
+                    {
+                        backgroundColor: innerColor,
+                        width: animatedInnerSize,
+                        height: animatedInnerSize,
+                        borderRadius: Animated.divide(animatedInnerSize, 2),
+                    }
+                ]} />
+            )}
         </Animated.View>
     );
 }

@@ -24,7 +24,7 @@ export function useChartData(limit = 60) {
 
     useEffect(() => {
         const sensorRef = ref(database, 'sensor_data');
-        
+
         // Try to use query with orderByKey and limitToLast
         // If that fails, fall back to fetching all data and limiting client-side
         let sensorQuery;
@@ -39,17 +39,17 @@ export function useChartData(limit = 60) {
             console.warn('Query with orderByKey failed, using base ref:', queryError);
             sensorQuery = sensorRef;
         }
-        
+
         const unsubscribe = onValue(
             sensorQuery,
             (snapshot) => {
                 setIsLoading(false);
                 setError(null);
-                
+
                 if (snapshot.exists()) {
                     const data = snapshot.val();
                     const entries = Object.entries(data);
-                    
+
                     // Sort by key (timestamp index) to ensure chronological order
                     // Convert keys to numbers for proper sorting
                     entries.sort((a, b) => {
@@ -57,30 +57,30 @@ export function useChartData(limit = 60) {
                         const keyB = parseInt(b[0]) || 0;
                         return keyA - keyB;
                     });
-                    
+
                     // Limit to last N entries if we fetched all data
-                    const limitedEntries = entries.length > limit 
+                    const limitedEntries = entries.length > limit
                         ? entries.slice(-limit)
                         : entries;
-                    
+
                     const times = [];
                     const vocIndex = [];
-                    
+
                     limitedEntries.forEach(([key, value]) => {
                         const vocValue = value.voc_index ?? value.vocIndex ?? DEFAULT_VALUES.VOC_INDEX;
                         const timestamp = value.timestamp ?? Date.now();
-                        
+
                         // Format time for display
                         const date = new Date(timestamp);
-                        const timeString = date.toLocaleTimeString('en-US', { 
-                            hour: '2-digit', 
-                            minute: '2-digit' 
+                        const timeString = date.toLocaleTimeString('en-US', {
+                            hour: '2-digit',
+                            minute: '2-digit'
                         });
-                        
+
                         times.push(timeString);
                         vocIndex.push(Number(vocValue));
                     });
-                    
+
                     setChartData({ times, vocIndex });
                 } else {
                     // No data available
@@ -93,7 +93,7 @@ export function useChartData(limit = 60) {
                 console.error('Chart data error:', firebaseError);
             }
         );
-        
+
         return () => unsubscribe();
     }, [limit]);
 
@@ -102,10 +102,10 @@ export function useChartData(limit = 60) {
         ? Math.max(...chartData.vocIndex)
         : 0;
 
-    return { 
-        chartData, 
-        isLoading, 
-        error, 
+    return {
+        chartData,
+        isLoading,
+        error,
         highestLevel,
         dataPointCount: chartData.vocIndex.length
     };
