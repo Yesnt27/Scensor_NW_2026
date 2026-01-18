@@ -1,13 +1,11 @@
 // Firebase Configuration
-// Follow the setup steps in SETUP_FIREBASE.md to get your credentials
 
 import { initializeApp } from 'firebase/app';
 import { getDatabase } from 'firebase/database';
 
 // Firebase Configuration
-// Updated with your project credentials from google-services.json
 const firebaseConfig = {
-    apiKey: "AIzaSyDWsZ_bGUHER409lUw6dFwX89abwScQerg",
+    apiKey: "API_KEY_HERE",
     authDomain: "scensor-a620a.firebaseapp.com",
     databaseURL: "https://scensor-a620a-default-rtdb.firebaseio.com",
     projectId: "scensor-a620a",

@@ -40,6 +40,7 @@ mobile/.expo/
 mobile/.expo-shared/
 .expo/
 
-# Firebase config (keep template, ignore actual config)
+# Firebase config
 mobile/config/firebase.local.js
+mobile/config/firebase.js
 
