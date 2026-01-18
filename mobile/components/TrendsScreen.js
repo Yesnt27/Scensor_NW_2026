@@ -7,7 +7,6 @@ import { STATE_TYPES } from '../hooks/useAlertState';
 import { FONT_FAMILY } from '../config/fonts';
 import { LAYOUT_CONFIG } from '../config/layout';
 import { LinearGradient } from 'expo-linear-gradient';
-import CloudButton from './CloudButton';
 import { trendsScreenStyles } from '../styles/trendsScreenStyles';
 
 export default function TrendsScreen({ onBack }) {
@@ -268,7 +267,7 @@ export default function TrendsScreen({ onBack }) {
             />
             
             {/* Back button */}
-            <CloudButton onPress={onBack} />
+            {/* <CloudButton onPress={onBack} /> */}
         </View>
     );
 }

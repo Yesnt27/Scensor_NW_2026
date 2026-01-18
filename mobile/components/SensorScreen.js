@@ -4,8 +4,9 @@ import { sensorScreenStyles } from '../styles/sensorScreenStyles';
 import { useSensorContext } from '../contexts/SensorContext';
 import { STATE_TYPES } from '../hooks/useAlertState';
 import { LAYOUT_CONFIG } from '../config/layout';
+import { FONT_FAMILY } from '../config/fonts';
 import SensorCircle from './SensorCircle';
-import CloudButton from './CloudButton';
+// import CloudButton from './CloudButton';
 import BottomGradient from './BottomGradient';
 import ParticleEffect from './ParticleEffect';
 import ResetButton from './ResetButton';
@@ -137,7 +138,6 @@ export default function SensorScreen({ onShowTrends }) {
                 </View>
             </View>
             
-            {/* ✅ Show "Detecting..." when no data, otherwise show values */}
             {isDetecting ? (
                 <View style={sensorScreenStyles.detectingContainer}>
                     <Text style={sensorScreenStyles.detectingText}>Detecting...</Text>
@@ -150,6 +150,7 @@ export default function SensorScreen({ onShowTrends }) {
                                 key={index}
                                 style={[
                                     sensorScreenStyles.rawValue,
+                                    index > 0 && sensorScreenStyles.rawValueFaded,
                                     { opacity: getOpacity(index) }
                                 ]}
                             >
@@ -164,7 +165,7 @@ export default function SensorScreen({ onShowTrends }) {
                 </View>
             )}
 
-            <CloudButton onPress={onShowTrends} />
+            {/* <CloudButton onPress={onShowTrends} /> */}
             <ResetButton onPress={handleReset} />
         </View>
     );
