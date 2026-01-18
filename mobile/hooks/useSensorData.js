@@ -9,38 +9,35 @@
 import { useState, useEffect } from 'react';
 import { database } from '../config/firebase';
 import { ref, onValue } from 'firebase/database';
-import { FIREBASE_PATHS, DEFAULT_VALUES } from '../utils/constants';
-import { parseSensorValue } from '../utils/dataParser';
+import { DEFAULT_VALUES } from '../utils/constants';
 
 export function useSensorData() {
     const [sensorValue, setSensorValue] = useState(DEFAULT_VALUES.SENSOR_VALUE);
-    const [unit, setUnit] = useState(DEFAULT_VALUES.UNIT);
+    const [unit, setUnit] = useState('VOC Index');
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const sensorRef = ref(database, FIREBASE_PATHS.SENSOR_VALUE);
-
+        // Change to read from sensor_data
+        const sensorRef = ref(database, 'sensor_data');
+        
         const unsubscribe = onValue(
             sensorRef,
             (snapshot) => {
                 setIsLoading(false);
                 setError(null);
-
+                
                 if (snapshot.exists()) {
-                    const rawValue = snapshot.val();
-                    const parsed = parseSensorValue(rawValue);
-
-                    if (parsed) {
-                        setSensorValue(parsed.value);
-                        if (parsed.unit) {
-                            setUnit(parsed.unit);
-                        }
-                    } else {
-                        setError('Unable to parse sensor value');
-                    }
+                    const data = snapshot.val();
+                    
+                    // Get the latest entry
+                    const entries = Object.entries(data);
+                    const latest = entries[entries.length - 1][1];
+                    
+                    // Use voc_index or raw value
+                    setSensorValue(latest.voc_index || latest.raw);
+                    setUnit('VOC Index');
                 } else {
-                    // No data available, use defaults
                     setSensorValue(DEFAULT_VALUES.SENSOR_VALUE);
                     setUnit(DEFAULT_VALUES.UNIT);
                 }
@@ -48,18 +45,11 @@ export function useSensorData() {
             (firebaseError) => {
                 setIsLoading(false);
                 setError(firebaseError.message);
-                console.error('Firebase error:', firebaseError);
             }
         );
-
+        
         return () => unsubscribe();
     }, []);
 
-    return {
-        sensorValue,
-        unit,
-        isLoading,
-        error,
-    };
+    return { sensorValue, unit, isLoading, error };
 }
-
