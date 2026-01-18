@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, Alert, Platform } from 'react-native';
-import { sensorScreenStyles } from '../styles/sensorScreenStyles';
+import { getSensorScreenStyles } from '../styles/sensorScreenStyles';
 import { useSensorContext } from '../contexts/SensorContext';
+import { useDimensions } from '../hooks/useDimensions';
 import { STATE_TYPES } from '../hooks/useAlertState';
 import { LAYOUT_CONFIG } from '../config/layout';
 import { FONT_FAMILY } from '../config/fonts';
@@ -13,6 +14,12 @@ import ResetButton from './ResetButton';
 import firebaseResetService from '../services/firebaseResetService';
 
 export default function SensorScreen({ onShowTrends }) {
+    // Get responsive dimensions (updates on screen size change)
+    const { isDesktop } = useDimensions();
+    
+    // Get responsive styles based on screen size
+    const sensorScreenStyles = getSensorScreenStyles(isDesktop);
+    
     const { vocIndex, rawValue, state, isLoading, error } = useSensorContext();
     
     const [rawValueHistory, setRawValueHistory] = useState([]);
