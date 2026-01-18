@@ -167,12 +167,6 @@ export default function TrendsScreen({ onBack }) {
                 style={trendsScreenStyles.bottomGradient}
             />
 
-            {/* Navigation indicators */}
-            <View style={trendsScreenStyles.navIndicators}>
-                <View style={trendsScreenStyles.navDot} />
-                <View style={trendsScreenStyles.navPill} />
-            </View>
-
             {/* Cloud Button */}
             <CloudButton onPress={onBack} />
         </View>
