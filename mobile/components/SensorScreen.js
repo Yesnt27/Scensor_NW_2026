@@ -13,11 +13,16 @@ import firebaseResetService from '../services/firebaseResetService';
 export default function SensorScreen({ onShowTrends }) {
     // Get responsive dimensions (updates on screen size change)
     const { isDesktop } = useDimensions();
-    
+
     // Get responsive styles based on screen size
     const sensorScreenStyles = getSensorScreenStyles(isDesktop);
+<<<<<<< HEAD
     
     const { vocIndex, rawValue, state, isLoading, error } = useSensorContext(); 
+=======
+
+    const { vocIndex, rawValue, state, isLoading, error } = useSensorContext();
+>>>>>>> b0ff880 (fixed the nativewind error please do    npm install nativewind@^3.0.0 thanks)
 
     const [rawValueHistory, setRawValueHistory] = useState([]);
     const previousRawValue = useRef(rawValue);
@@ -151,6 +156,7 @@ export default function SensorScreen({ onShowTrends }) {
         <View style={sensorScreenStyles.container}>
             <BottomGradient state={state} />
 
+<<<<<<< HEAD
             {/* ✅ Alert Banner */}
             {showAlert && (
                 <Animated.View
@@ -194,6 +200,9 @@ export default function SensorScreen({ onShowTrends }) {
             )}
 
             <Text style={sensorScreenStyles.title} className="text-white">Scensor</Text>
+=======
+            <Text style={sensorScreenStyles.title}>Scensor</Text>
+>>>>>>> b0ff880 (fixed the nativewind error please do    npm install nativewind@^3.0.0 thanks)
 
             <View style={sensorScreenStyles.sensorContainer}>
                 <View style={sensorScreenStyles.circleWrapper}>
