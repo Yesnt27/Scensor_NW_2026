@@ -1,23 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Alert, Platform } from 'react-native';
+import { View, Text, Alert, Platform, Animated } from 'react-native';
 import { sensorScreenStyles } from '../styles/sensorScreenStyles';
 import { useSensorContext } from '../contexts/SensorContext';
 import { STATE_TYPES } from '../hooks/useAlertState';
 import { LAYOUT_CONFIG } from '../config/layout';
 import { FONT_FAMILY } from '../config/fonts';
 import SensorCircle from './SensorCircle';
-// import CloudButton from './CloudButton';
 import BottomGradient from './BottomGradient';
 import ParticleEffect from './ParticleEffect';
 import ResetButton from './ResetButton';
 import firebaseResetService from '../services/firebaseResetService';
 
 export default function SensorScreen({ onShowTrends }) {
-    const { vocIndex, rawValue, state, isLoading, error } = useSensorContext();
+    const { vocIndex, rawValue, state, isLoading, error } = useSensorContext(); 
     
     const [rawValueHistory, setRawValueHistory] = useState([]);
     const previousRawValue = useRef(rawValue);
     const MAX_HISTORY = 4;
+
+    // ✅ Alert banner animation
+    const alertOpacity = useRef(new Animated.Value(0)).current;
+    const [showAlert, setShowAlert] = useState(false);
     
     useEffect(() => {
         if (rawValue !== previousRawValue.current) {
@@ -28,6 +31,24 @@ export default function SensorScreen({ onShowTrends }) {
             previousRawValue.current = rawValue;
         }
     }, [rawValue]);
+
+    // ✅ Show/hide alert banner when VOC exceeds threshold
+    useEffect(() => {
+        if (vocIndex !== null && vocIndex > 250) {
+            setShowAlert(true);
+            Animated.timing(alertOpacity, {
+                toValue: 1,
+                duration: 300,
+                useNativeDriver: true,
+            }).start();
+        } else {
+            Animated.timing(alertOpacity, {
+                toValue: 0,
+                duration: 300,
+                useNativeDriver: true,
+            }).start(() => setShowAlert(false));
+        }
+    }, [vocIndex]);
     
     const handleReset = () => {
         if (Platform.OS === 'web') {
@@ -124,6 +145,48 @@ export default function SensorScreen({ onShowTrends }) {
     return (
         <View style={sensorScreenStyles.container}>
             <BottomGradient state={state} />
+
+            {/* ✅ Alert Banner */}
+            {showAlert && (
+                <Animated.View
+                    style={{
+                        position: 'absolute',
+                        top: 60,
+                        left: 20,
+                        right: 20,
+                        backgroundColor: '#FF0000',
+                        paddingHorizontal: 20,
+                        paddingVertical: 15,
+                        borderRadius: 12,
+                        zIndex: 100,
+                        opacity: alertOpacity,
+                        shadowColor: '#FF0000',
+                        shadowOffset: { width: 0, height: 4 },
+                        shadowOpacity: 0.5,
+                        shadowRadius: 10,
+                        elevation: 10,
+                    }}
+                >
+                    <Text style={{
+                        color: '#FFFFFF',
+                        fontSize: 18,
+                        fontFamily: FONT_FAMILY,
+                        fontWeight: 'bold',
+                        textAlign: 'center',
+                    }}>
+                        🚨 AIR QUALITY ALERT
+                    </Text>
+                    <Text style={{
+                        color: '#FFFFFF',
+                        fontSize: 14,
+                        fontFamily: FONT_FAMILY,
+                        textAlign: 'center',
+                        marginTop: 5,
+                    }}>
+                        VOC Index: {vocIndex} - Exceeds safe threshold (250)
+                    </Text>
+                </Animated.View>
+            )}
             
             <Text style={sensorScreenStyles.title}>Scensor</Text>
             
@@ -165,7 +228,6 @@ export default function SensorScreen({ onShowTrends }) {
                 </View>
             )}
 
-            {/* <CloudButton onPress={onShowTrends} /> */}
             <ResetButton onPress={handleReset} />
         </View>
     );
