@@ -5,14 +5,16 @@
 
 // Firebase Database Paths
 export const FIREBASE_PATHS = {
-    SENSOR_VALUE: 'sensor_data',  // Changed from 'sensor/value' to match ESP32
+    SENSOR_VALUE: 'sensor_data',
     DEVICES: 'devices',
 };
 
 // Default Values
 export const DEFAULT_VALUES = {
-    SENSOR_VALUE: 100,  
-    UNIT: 'VOC Index',  
+    VOC_INDEX: 100,
+    RAW_VALUE: 30000,
+    SENSOR_VALUE: 100,  // Keep for backward compatibility
+    UNIT: 'VOC Index',
 };
 
 // Data Parsing

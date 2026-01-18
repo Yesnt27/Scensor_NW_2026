@@ -3,7 +3,7 @@
  * Handles Firebase real-time data subscription for sensor values
  * 
  * Usage:
- *   const { sensorValue, unit, isLoading, error } = useSensorData();
+ *   const { vocIndex, rawValue, isLoading, error } = useSensorData();
  */
 
 import { useState, useEffect } from 'react';
@@ -12,13 +12,12 @@ import { ref, onValue } from 'firebase/database';
 import { DEFAULT_VALUES } from '../utils/constants';
 
 export function useSensorData() {
-    const [sensorValue, setSensorValue] = useState(DEFAULT_VALUES.SENSOR_VALUE);
-    const [unit, setUnit] = useState('VOC Index');
+    const [vocIndex, setVocIndex] = useState(DEFAULT_VALUES.VOC_INDEX);
+    const [rawValue, setRawValue] = useState(DEFAULT_VALUES.RAW_VALUE);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        // Change to read from sensor_data
         const sensorRef = ref(database, 'sensor_data');
         
         const unsubscribe = onValue(
@@ -34,12 +33,12 @@ export function useSensorData() {
                     const entries = Object.entries(data);
                     const latest = entries[entries.length - 1][1];
                     
-                    // Use voc_index or raw value
-                    setSensorValue(latest.voc_index || latest.raw);
-                    setUnit('VOC Index');
+                    // Set both VOC index and raw value
+                    setVocIndex(latest.voc_index || DEFAULT_VALUES.VOC_INDEX);
+                    setRawValue(latest.raw || DEFAULT_VALUES.RAW_VALUE);
                 } else {
-                    setSensorValue(DEFAULT_VALUES.SENSOR_VALUE);
-                    setUnit(DEFAULT_VALUES.UNIT);
+                    setVocIndex(DEFAULT_VALUES.VOC_INDEX);
+                    setRawValue(DEFAULT_VALUES.RAW_VALUE);
                 }
             },
             (firebaseError) => {
@@ -51,5 +50,5 @@ export function useSensorData() {
         return () => unsubscribe();
     }, []);
 
-    return { sensorValue, unit, isLoading, error };
+    return { vocIndex, rawValue, isLoading, error };
 }

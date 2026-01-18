@@ -20,31 +20,31 @@ import ParticleEffect from './ParticleEffect';
 
 export default function SensorScreen() {
     // Fetch sensor data from Firebase
-    const { sensorValue, unit, isLoading, error } = useSensorData();
-
+    const { vocIndex, rawValue, isLoading, error } = useSensorData();
+    
     // Manage state based on sensor value and button press
-    // Cycles through: normal → alert → detecting → normal
-    const { state, toggleState } = useAlertState(sensorValue);
-
+    // Use VOC index for alert logic
+    const { state, toggleState } = useAlertState(vocIndex);
+    
     // Show loading or error states if needed
     if (error) {
         console.warn('Sensor data error:', error);
     }
-
+    
     // Display text based on state
     const displayText = state === STATE_TYPES.DETECTING
         ? 'Detecting...'
-        : `${sensorValue} ${unit}`;
-
+        : `VOC: ${vocIndex} | Raw: ${rawValue}`;
+    
     const isDetecting = state === STATE_TYPES.DETECTING;
     const circleSize = isDetecting
         ? LAYOUT_CONFIG.circle.detectingSize
         : LAYOUT_CONFIG.circle.size;
-
+    
     return (
         <View style={sensorScreenStyles.container}>
             <Text style={sensorScreenStyles.title}>Scensor</Text>
-
+            
             <View style={sensorScreenStyles.sensorContainer}>
                 <View style={sensorScreenStyles.circleWrapper}>
                     <SensorCircle state={state} />
@@ -54,7 +54,7 @@ export default function SensorScreen() {
                     {displayText}
                 </Text>
             </View>
-
+            
             <BottomGradient state={state} />
             <CloudButton onPress={toggleState} />
         </View>

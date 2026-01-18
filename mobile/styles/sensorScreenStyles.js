@@ -41,5 +41,11 @@ export const sensorScreenStyles = StyleSheet.create({
         bottom: 160,
         alignSelf: 'center',
     },
+    valueContainer: {
+        alignItems: 'center',
+        position: 'absolute',
+        bottom: 160,
+        alignSelf: 'center',
+    },
 });
 
