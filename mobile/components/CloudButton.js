@@ -7,20 +7,20 @@
  */
 
 import React from 'react';
-import { TouchableOpacity, View, Text } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import { cloudButtonStyles } from '../styles/cloudButtonStyles';
+import CloudIcon from './CloudIcon';
 
 export default function CloudButton({ onPress }) {
     return (
-        <TouchableOpacity
-            style={cloudButtonStyles.button}
+        <TouchableOpacity 
+            style={cloudButtonStyles.button} 
             onPress={onPress}
             activeOpacity={0.7}
         >
             <View style={cloudButtonStyles.icon}>
-                <Text style={cloudButtonStyles.iconText}>☁</Text>
+                <CloudIcon size={45} color="#FFFFFF" />
             </View>
         </TouchableOpacity>
     );
 }
-

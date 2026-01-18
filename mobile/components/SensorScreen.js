@@ -1,32 +1,30 @@
 /**
  * SensorScreen Component
  * Main screen displaying sensor data with real-time updates
- * 
- * Responsibilities:
- * - Display sensor value and unit
- * - Show alert state (red/green)
- * - Handle button interactions
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { getSensorScreenStyles } from '../styles/sensorScreenStyles';
-import { useSensorData, useAlertState, STATE_TYPES, useDimensions } from '../hooks';
+import { useSensorContext } from '../contexts/SensorContext';
+import { useDimensions } from '../hooks';
+import { STATE_TYPES } from '../hooks/useAlertState';
 import { LAYOUT_CONFIG } from '../config/layout';
 import SensorCircle from './SensorCircle';
 import CloudButton from './CloudButton';
 import BottomGradient from './BottomGradient';
 import ParticleEffect from './ParticleEffect';
 
-export default function SensorScreen() {
+export default function SensorScreen({ onShowTrends }) {
     // Get responsive dimensions (updates on screen size change)
     const { isDesktop } = useDimensions();
     
     // Get responsive styles based on screen size
     const sensorScreenStyles = getSensorScreenStyles(isDesktop);
     
-    // Fetch sensor data from Firebase
-    const { vocIndex, rawValue, isLoading, error } = useSensorData();
+    // Use shared context instead of calling hooks directly
+    const { vocIndex, rawValue, state, isLoading, error } = useSensorContext();
+    const [useImages, setUseImages] = useState(false);
     
     // Track historical raw values (most recent first)
     const [rawValueHistory, setRawValueHistory] = useState([]);
@@ -47,15 +45,11 @@ export default function SensorScreen() {
         }
     }, [rawValue]);
     
-    // Manage state based on sensor value and button press
-    // Use VOC index for alert logic
-    const { state, toggleState } = useAlertState(vocIndex);
-    
     // Show loading or error states if needed
     if (error) {
         console.warn('Sensor data error:', error);
     }
-    
+
     const isDetecting = state === STATE_TYPES.DETECTING;
     const circleSize = isDetecting
         ? LAYOUT_CONFIG.circle.detectingSize
@@ -90,11 +84,13 @@ export default function SensorScreen() {
     
     return (
         <View style={sensorScreenStyles.container}>
-            <Text style={sensorScreenStyles.title}>Scensor</Text>
-            
+            <TouchableOpacity onPress={() => setUseImages(!useImages)}>
+                <Text style={sensorScreenStyles.title}>Scensor</Text>
+            </TouchableOpacity>
+
             <View style={sensorScreenStyles.sensorContainer}>
                 <View style={sensorScreenStyles.circleWrapper}>
-                    <SensorCircle state={state} />
+                    <SensorCircle state={state} useImages={useImages} />
                     <ParticleEffect isActive={isDetecting} circleSize={circleSize} />
                 </View>
             </View>
@@ -121,9 +117,9 @@ export default function SensorScreen() {
                     <Text style={sensorScreenStyles.vocValue}>{formatVOC(vocIndex)}</Text>
                 </View>
             </View>
-            
+
             <BottomGradient state={state} />
-            <CloudButton onPress={toggleState} />
+            <CloudButton onPress={onShowTrends} />
         </View>
     );
 }
