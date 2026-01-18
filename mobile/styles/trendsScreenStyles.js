@@ -89,4 +89,29 @@ export const trendsScreenStyles = StyleSheet.create({
         textAlign: 'center',
         marginTop: 100,
     },
+    statsRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginHorizontal: 20,
+        marginBottom: 20,
+        gap: 15,
+    },
+    statBox: {
+        flex: 1,
+        alignItems: 'center',
+        paddingVertical: 15,
+        backgroundColor: '#1a1a1a',
+        borderRadius: 15,
+    },
+    statLabel: {
+        fontFamily: FONT_FAMILY,
+        fontSize: 14,
+        color: '#888888',
+        marginBottom: 8,
+    },
+    statValue: {
+        fontFamily: FONT_FAMILY,
+        fontSize: 32,
+        fontWeight: 'bold',
+    },
 });
