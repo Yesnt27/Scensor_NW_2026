@@ -14,13 +14,13 @@ export default function TrendsScreen({ onBack }) {
     const { vocIndex, state } = useSensorContext();
     const { vocHistory, timestamps, highestVoc, isLoading, error } = useSensorHistory(50);
     
-    // ✅ Track dimensions with state and listen for changes
+    // Track dimensions with state and listen for changes
     const [dimensions, setDimensions] = useState({
         width: Dimensions.get('window').width,
         height: Dimensions.get('window').height,
     });
     
-    // ✅ Listen for dimension changes (screen resize, rotation)
+    // Listen for dimension changes (screen resize, rotation)
     useEffect(() => {
         const subscription = Dimensions.addEventListener('change', ({ window }) => {
             setDimensions({
@@ -29,14 +29,13 @@ export default function TrendsScreen({ onBack }) {
             });
         });
         
-        // Cleanup listener on unmount
         return () => subscription?.remove();
     }, []);
     
     if (isLoading) return <Text style={trendsScreenStyles.loadingText}>Loading...</Text>;
     if (error) return <Text style={trendsScreenStyles.errorText}>Error: {error}</Text>;
     
-    // ✅ Use state dimensions instead of Dimensions.get()
+    // Use state dimensions
     const chartWidth = dimensions.width * 0.9;
     const chartHeight = Math.min(dimensions.height * 0.35, 350);
     
@@ -152,6 +151,7 @@ export default function TrendsScreen({ onBack }) {
         <View style={trendsScreenStyles.container}>
             <Text style={trendsScreenStyles.title}>Trends</Text>
             
+            {/* Stats Row */}
             <View style={trendsScreenStyles.statsRow}>
                 <View style={trendsScreenStyles.statBox}>
                     <Text style={trendsScreenStyles.statLabel}>Current VOC</Text>
@@ -173,8 +173,10 @@ export default function TrendsScreen({ onBack }) {
                 </View>
             </View>
             
+            {/* Chart */}
             <View style={trendsScreenStyles.chartContainer}>
                 <Svg width={chartWidth} height={chartHeight}>
+                    {/* Y-axis */}
                     <Line
                         x1={padding}
                         y1={padding}
@@ -184,6 +186,7 @@ export default function TrendsScreen({ onBack }) {
                         strokeWidth="1"
                     />
                     
+                    {/* X-axis */}
                     <Line
                         x1={padding}
                         y1={chartHeight - padding}
@@ -193,6 +196,7 @@ export default function TrendsScreen({ onBack }) {
                         strokeWidth="1"
                     />
                     
+                    {/* Tolerance line (250 VOC threshold) */}
                     <Line
                         x1={padding}
                         y1={toleranceY}
@@ -210,9 +214,10 @@ export default function TrendsScreen({ onBack }) {
                         fontFamily={FONT_FAMILY}
                         textAnchor="end"
                     >
-                        Tolerance
+                        Tolerance (250)
                     </SvgText>
                     
+                    {/* VOC data line */}
                     <Path
                         d={createSmoothPath()}
                         stroke="#FFFFFF"
@@ -222,6 +227,7 @@ export default function TrendsScreen({ onBack }) {
                         strokeLinejoin="round"
                     />
                     
+                    {/* Y-axis label */}
                     <SvgText
                         x={15}
                         y={chartHeight / 2}
@@ -231,9 +237,10 @@ export default function TrendsScreen({ onBack }) {
                         textAnchor="middle"
                         transform={`rotate(-90, 15, ${chartHeight / 2})`}
                     >
-                        VOC index
+                        VOC Index
                     </SvgText>
                     
+                    {/* X-axis timestamps */}
                     {displayTimes.map((item, index) => (
                         <SvgText
                             key={index}
@@ -250,14 +257,17 @@ export default function TrendsScreen({ onBack }) {
                 </Svg>
             </View>
             
+            {/* Highest level text */}
             <Text style={trendsScreenStyles.highestText}>Highest level: {highestVoc}</Text>
             
+            {/* Bottom gradient */}
             <LinearGradient
                 colors={['#000000', gradientColor]}
                 locations={[0, 1]}
                 style={trendsScreenStyles.bottomGradient}
             />
             
+            {/* Back button */}
             <CloudButton onPress={onBack} />
         </View>
     );
