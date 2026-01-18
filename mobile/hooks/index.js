@@ -4,5 +4,5 @@
  */
 
 export { useSensorData } from './useSensorData';
-export { useAlertState } from './useAlertState';
+export { useAlertState, STATE_TYPES } from './useAlertState';
 

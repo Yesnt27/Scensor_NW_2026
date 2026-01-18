@@ -1,20 +1,27 @@
 /**
  * BottomGradient Component
- * Displays a gradient at the bottom of the screen that changes color based on alert state
+ * Displays a gradient at the bottom of the screen that changes color based on state
  * 
  * Props:
- *   - isAlert: Boolean indicating if alert state is active (default: false)
+ *   - state: String indicating current state ('normal', 'alert', 'detecting')
  */
 
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { LAYOUT_CONFIG } from '../config/layout';
+import { STATE_TYPES } from '../hooks/useAlertState';
 
-export default function BottomGradient({ isAlert = false }) {
-    const gradientColor = isAlert
-        ? LAYOUT_CONFIG.gradient.alertColor
-        : LAYOUT_CONFIG.gradient.normalColor;
+export default function BottomGradient({ state = STATE_TYPES.NORMAL }) {
+    // Determine gradient color based on state
+    let gradientColor;
+    if (state === STATE_TYPES.ALERT) {
+        gradientColor = LAYOUT_CONFIG.gradient.alertColor;
+    } else if (state === STATE_TYPES.DETECTING) {
+        gradientColor = LAYOUT_CONFIG.gradient.detectingColor;
+    } else {
+        gradientColor = LAYOUT_CONFIG.gradient.normalColor;
+    }
 
     return (
         <LinearGradient

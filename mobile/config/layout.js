@@ -4,6 +4,7 @@ export const LAYOUT_CONFIG = {
         borderRadius: 30,
         normalColor: '#00C25F',
         alertColor: '#FE0000',
+        detectingColor: '#FFFFFF',
     },
     sensorValue: {
         marginTop: 70,
@@ -15,10 +16,14 @@ export const LAYOUT_CONFIG = {
     circle: {
         size: 225,
         innerSize: 165,
+        detectingSize: 180, // Smaller size for detecting state
+        detectingInnerSize: 130, // Smaller inner size for detecting state
         threshold: 980000,
         normalColor: '#00DF82',
         alertColor: '#980000',
+        detectingColor: '#FFFFFF',
         outerColorNormal: '#00C25F',
         outerColorAlert: '#FE0000',
+        outerColorDetecting: '#b7b7b7',
     },
 };
