@@ -1,168 +1,159 @@
 /**
  * SensorCircle Component
- * Displays a two-toned circle that changes color and size based on state
- * Animates size transitions and synchronized pulsing
- * 
- * Props:
- *   - state: String indicating current state ('normal', 'alert', 'detecting')
+ * Displays a breathing circle with glow effects
  */
 
 import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Animated, Easing, Image } from 'react-native';
+import { View, StyleSheet, Animated, Easing } from 'react-native';
 import { LAYOUT_CONFIG } from '../config/layout';
 import { STATE_TYPES } from '../hooks/useAlertState';
 
-export default function SensorCircle({ state = STATE_TYPES.NORMAL, useImages = false }) {
+export default function SensorCircle({ state = STATE_TYPES.NORMAL }) {
     const isDetecting = state === STATE_TYPES.DETECTING;
     const isAlert = state === STATE_TYPES.ALERT;
 
-    // Animated values for sizes
-    const outerSizeAnim = useRef(new Animated.Value(LAYOUT_CONFIG.circle.size)).current;
-    const innerSizeAnim = useRef(new Animated.Value(LAYOUT_CONFIG.circle.innerSize)).current;
-
-    // Shared pulsing animation for both circles during detecting
-    const pulseAnim = useRef(new Animated.Value(1)).current;
+    // Animated values
+    const breatheAnim = useRef(new Animated.Value(1)).current;
+    const glowAnim = useRef(new Animated.Value(20)).current;
+    const glowOpacityAnim = useRef(new Animated.Value(0.6)).current;
 
     useEffect(() => {
-        // Animate sizes with ease in/out
-        Animated.parallel([
-            Animated.timing(outerSizeAnim, {
-                toValue: isDetecting
-                    ? LAYOUT_CONFIG.circle.detectingSize
-                    : LAYOUT_CONFIG.circle.size,
-                duration: 600,
-                easing: Easing.inOut(Easing.ease),
-                useNativeDriver: false,
-            }),
-            Animated.timing(innerSizeAnim, {
-                toValue: isDetecting
-                    ? LAYOUT_CONFIG.circle.detectingInnerSize
-                    : LAYOUT_CONFIG.circle.innerSize,
-                duration: 600,
-                easing: Easing.inOut(Easing.ease),
-                useNativeDriver: false,
-            }),
-        ]).start();
-
-        // Shared pulsing animation for both circles during detecting
-        if (isDetecting) {
-            const pulseAnimation = Animated.loop(
-                Animated.sequence([
-                    Animated.timing(pulseAnim, {
-                        toValue: 1.15, // Scale up to 115%
-                        duration: 1000,
+        // Continuous breathing animation (5 second cycle - slower)
+        const breathAnimation = Animated.loop(
+            Animated.sequence([
+                // Inhale - expand
+                Animated.parallel([
+                    Animated.timing(breatheAnim, {
+                        toValue: 1.15, // Increased from 1.05 to 1.15 (115% scale)
+                        duration: 2500,
+                        easing: Easing.inOut(Easing.ease),
+                        useNativeDriver: true,
+                    }),
+                    Animated.timing(glowAnim, {
+                        toValue: 50, // Increased from 35 to 50
+                        duration: 2500,
                         easing: Easing.inOut(Easing.ease),
                         useNativeDriver: false,
                     }),
-                    Animated.timing(pulseAnim, {
-                        toValue: 1, // Scale back to 100%
-                        duration: 1000,
+                    Animated.timing(glowOpacityAnim, {
+                        toValue: 0.9, // Increased from 0.8 to 0.9
+                        duration: 2500,
+                        easing: Easing.inOut(Easing.ease),
+                        useNativeDriver: true,
+                    }),
+                ]),
+                // Exhale - contract
+                Animated.parallel([
+                    Animated.timing(breatheAnim, {
+                        toValue: 1,
+                        duration: 2500,
+                        easing: Easing.inOut(Easing.ease),
+                        useNativeDriver: true,
+                    }),
+                    Animated.timing(glowAnim, {
+                        toValue: 20,
+                        duration: 2500,
                         easing: Easing.inOut(Easing.ease),
                         useNativeDriver: false,
                     }),
-                ])
-            );
-            pulseAnimation.start();
+                    Animated.timing(glowOpacityAnim, {
+                        toValue: 0.6,
+                        duration: 2500,
+                        easing: Easing.inOut(Easing.ease),
+                        useNativeDriver: true,
+                    }),
+                ]),
+            ])
+        );
 
-            return () => {
-                pulseAnimation.stop();
-                pulseAnim.setValue(1);
-            };
-        } else {
-            pulseAnim.setValue(1);
-        }
-    }, [isDetecting, outerSizeAnim, innerSizeAnim, pulseAnim]);
+        breathAnimation.start();
 
-    // Determine outer circle color based on state
-    let outerColor;
+        return () => {
+            breathAnimation.stop();
+        };
+    }, [breatheAnim, glowAnim, glowOpacityAnim]);
+
+    // Determine colors based on state
+    let outerColor, innerColor, glowColor;
+    
     if (isAlert) {
-        outerColor = LAYOUT_CONFIG.circle.outerColorAlert;
+        outerColor = '#CC0000';
+        innerColor = '#FF0000';
+        glowColor = '#FF0000';
     } else if (isDetecting) {
-        outerColor = LAYOUT_CONFIG.circle.outerColorDetecting;
+        outerColor = '#b7b7b7';
+        innerColor = '#FFFFFF';
+        glowColor = '#FFFFFF';
     } else {
-        outerColor = LAYOUT_CONFIG.circle.outerColorNormal;
-    }
-
-    // Determine inner circle color - stay white in detecting, don't animate back to green
-    let innerColor;
-    if (isAlert) {
-        innerColor = LAYOUT_CONFIG.circle.alertColor;
-    } else if (isDetecting) {
-        innerColor = LAYOUT_CONFIG.circle.detectingColor; // White, no green transition
-    } else {
-        innerColor = LAYOUT_CONFIG.circle.normalColor;
-    }
-
-    // Calculate animated sizes with shared pulse effect
-    const animatedOuterSize = isDetecting
-        ? Animated.multiply(outerSizeAnim, pulseAnim)
-        : outerSizeAnim;
-
-    const animatedInnerSize = isDetecting
-        ? Animated.multiply(innerSizeAnim, pulseAnim)
-        : innerSizeAnim;
-
-    // Determine which image to show when useImages is true
-    let imageSource = null;
-    if (useImages && !isDetecting) {
-        if (isAlert) {
-            imageSource = require('../assets/images/yes_smile.png');
-        } else {
-            imageSource = require('../assets/images/no_smell.png');
-        }
+        outerColor = '#00CC66';
+        innerColor = '#00FF88';
+        glowColor = '#00FF88';
     }
 
     return (
-        <Animated.View style={[
-            styles.outerCircle,
-            {
-                backgroundColor: outerColor,
-                width: animatedOuterSize,
-                height: animatedOuterSize,
-                borderRadius: Animated.divide(animatedOuterSize, 2),
-            }
-        ]}>
-            {useImages && imageSource ? (
-                <Animated.View style={[
-                    styles.innerCircle,
+        <View style={styles.container}>
+            {/* Outer glow */}
+            <Animated.View
+                style={[
+                    styles.glow,
                     {
-                        width: Animated.multiply(animatedInnerSize, 1.8),
-                        height: Animated.multiply(animatedInnerSize, 1.8),
-                        borderRadius: Animated.divide(Animated.multiply(animatedInnerSize, 1.3), 2),
-                        overflow: 'hidden',
-                    }
-                ]}>
-                    <Image
-                        source={imageSource}
-                        style={{
-                            width: '100%',
-                            height: '100%',
-                            resizeMode: 'cover',
-                        }}
-                    />
-                </Animated.View>
-            ) : (
-                <Animated.View style={[
-                    styles.innerCircle,
+                        width: LAYOUT_CONFIG.circle.size + 80,
+                        height: LAYOUT_CONFIG.circle.size + 80,
+                        borderRadius: (LAYOUT_CONFIG.circle.size + 80) / 2,
+                        backgroundColor: glowColor,
+                        opacity: glowOpacityAnim,
+                        shadowColor: glowColor,
+                        shadowRadius: glowAnim,
+                        shadowOpacity: 1,
+                        transform: [{ scale: breatheAnim }],
+                    },
+                ]}
+            />
+
+            {/* Main breathing circle */}
+            <Animated.View
+                style={[
+                    styles.outerCircle,
                     {
-                        backgroundColor: innerColor,
-                        width: animatedInnerSize,
-                        height: animatedInnerSize,
-                        borderRadius: Animated.divide(animatedInnerSize, 2),
-                    }
-                ]} />
-            )}
-        </Animated.View>
+                        backgroundColor: outerColor,
+                        width: LAYOUT_CONFIG.circle.size,
+                        height: LAYOUT_CONFIG.circle.size,
+                        borderRadius: LAYOUT_CONFIG.circle.size / 2,
+                        transform: [{ scale: breatheAnim }],
+                    },
+                ]}
+            >
+                <View
+                    style={[
+                        styles.innerCircle,
+                        {
+                            backgroundColor: innerColor,
+                            width: LAYOUT_CONFIG.circle.innerSize,
+                            height: LAYOUT_CONFIG.circle.innerSize,
+                            borderRadius: LAYOUT_CONFIG.circle.innerSize / 2,
+                        },
+                    ]}
+                />
+            </Animated.View>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
-    outerCircle: {
+    container: {
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 20,
     },
-    innerCircle: {
-        // Size, borderRadius, and backgroundColor are set dynamically
+    glow: {
+        position: 'absolute',
+        elevation: 0,
+        shadowOffset: { width: 0, height: 0 },
     },
+    outerCircle: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        elevation: 5,
+    },
+    innerCircle: {},
 });

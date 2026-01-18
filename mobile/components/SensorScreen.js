@@ -4,10 +4,9 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import { getSensorScreenStyles } from '../styles/sensorScreenStyles';
+import { View, Text } from 'react-native';
+import { sensorScreenStyles } from '../styles/sensorScreenStyles';
 import { useSensorContext } from '../contexts/SensorContext';
-import { useDimensions } from '../hooks';
 import { STATE_TYPES } from '../hooks/useAlertState';
 import { LAYOUT_CONFIG } from '../config/layout';
 import SensorCircle from './SensorCircle';
@@ -16,15 +15,7 @@ import BottomGradient from './BottomGradient';
 import ParticleEffect from './ParticleEffect';
 
 export default function SensorScreen({ onShowTrends }) {
-    // Get responsive dimensions (updates on screen size change)
-    const { isDesktop } = useDimensions();
-    
-    // Get responsive styles based on screen size
-    const sensorScreenStyles = getSensorScreenStyles(isDesktop);
-    
-    // Use shared context instead of calling hooks directly
     const { vocIndex, rawValue, state, isLoading, error } = useSensorContext();
-    const [useImages, setUseImages] = useState(false);
     
     // Track historical raw values (most recent first)
     const [rawValueHistory, setRawValueHistory] = useState([]);
@@ -45,11 +36,10 @@ export default function SensorScreen({ onShowTrends }) {
         }
     }, [rawValue]);
     
-    // Show loading or error states if needed
     if (error) {
         console.warn('Sensor data error:', error);
     }
-
+    
     const isDetecting = state === STATE_TYPES.DETECTING;
     const circleSize = isDetecting
         ? LAYOUT_CONFIG.circle.detectingSize
@@ -81,17 +71,31 @@ export default function SensorScreen({ onShowTrends }) {
             displayValues.push(rawValue);
         }
     }
-    
+
+    // Particle color matches state
+    const particleColor = state === STATE_TYPES.ALERT 
+        ? '#FF0000'  // Red
+        : state === STATE_TYPES.DETECTING
+        ? '#FFFFFF'  // White
+        : '#00FF88'; // Green
+
     return (
         <View style={sensorScreenStyles.container}>
-            <TouchableOpacity onPress={() => setUseImages(!useImages)}>
-                <Text style={sensorScreenStyles.title}>Scensor</Text>
-            </TouchableOpacity>
-
+            {/* Gradient at bottom */}
+            <BottomGradient state={state} />
+            
+            {/* Title */}
+            <Text style={sensorScreenStyles.title}>Scensor</Text>
+            
+            {/* Sensor display */}
             <View style={sensorScreenStyles.sensorContainer}>
                 <View style={sensorScreenStyles.circleWrapper}>
-                    <SensorCircle state={state} useImages={useImages} />
-                    <ParticleEffect isActive={isDetecting} circleSize={circleSize} />
+                    <SensorCircle state={state} />
+                    <ParticleEffect 
+                        isActive={true}
+                        circleSize={circleSize}
+                        color={particleColor}
+                    />
                 </View>
             </View>
             
@@ -118,7 +122,7 @@ export default function SensorScreen({ onShowTrends }) {
                 </View>
             </View>
 
-            <BottomGradient state={state} />
+            {/* Button on top */}
             <CloudButton onPress={onShowTrends} />
         </View>
     );

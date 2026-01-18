@@ -1,140 +1,107 @@
 /**
  * ParticleEffect Component
- * Displays animated particles around the circle during detecting state
- * Particles slowly rotate around the circle
- * 
- * Props:
- *   - isActive: Boolean indicating if particles should be animated
- *   - circleSize: Size of the circle to position particles around
+ * Particles spawn from circle edge, float upward with wobble
  */
 
 import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, Animated, Easing } from 'react-native';
 
-const PARTICLE_COUNT = 200;
-const PARTICLE_COLORS = [
-    '#FFFFFF', '#F5F5F5', '#E8E8E8', '#DCDCDC', '#D0D0D0',
-    '#C0C0C0', '#B0B0B0', '#A0A0A0', '#909090', '#808080',
-    '#707070', '#606060', '#E0E0E0', '#F0F0F0', '#FAFAFA'
-];
+const SPAWN_RATE = 500; // Spawn every 500ms (2 particles/second)
 
-export default function ParticleEffect({ isActive, circleSize }) {
-    const [particlePositions, setParticlePositions] = useState({});
-
-    const particles = useRef(
-        Array.from({ length: PARTICLE_COUNT }, (_, i) => {
-            // Uniform angle distribution around the circle
-            const baseAngle = (360 / PARTICLE_COUNT) * i;
-            // Small random offset for natural variation (max 5 degrees)
-            const angle = baseAngle + (Math.random() - 0.5) * 10;
-
-            // More uniform distance with slight variation - farther from circle
-            const baseDistance = circleSize / 2 + 60;
-            const distance = baseDistance + (Math.random() - 0.5) * 20;
-
-            return {
-                id: i,
-                baseAngle: baseAngle,
-                initialAngle: angle,
-                distance: distance,
-                size: 2 + Math.random() * 6,
-                color: PARTICLE_COLORS[Math.floor(Math.random() * PARTICLE_COLORS.length)],
-                rotation: new Animated.Value(angle),
-                opacity: 0.6 + Math.random() * 0.4,
-            };
-        })
-    ).current;
+export default function ParticleEffect({ isActive, circleSize, color = '#00FF88' }) {
+    const [particles, setParticles] = useState([]);
+    const particleIdRef = useRef(0);
 
     useEffect(() => {
-        if (isActive) {
-            // Initialize positions
-            const initialPositions = {};
-            particles.forEach((particle) => {
-                const angleRad = (particle.initialAngle * Math.PI) / 180;
-                initialPositions[particle.id] = {
-                    x: Math.cos(angleRad) * particle.distance,
-                    y: Math.sin(angleRad) * particle.distance,
-                };
-            });
-            setParticlePositions(initialPositions);
-
-            // Create slow rotation animation for each particle
-            const animations = particles.map((particle) => {
-                // Each particle rotates at slightly different speeds for organic movement
-                const rotationSpeed = 20000 + Math.random() * 10000; // 20-30 seconds per full rotation
-
-                const animation = Animated.loop(
-                    Animated.timing(particle.rotation, {
-                        toValue: particle.initialAngle + 360,
-                        duration: rotationSpeed,
-                        easing: Easing.linear,
-                        useNativeDriver: false,
-                    })
-                );
-
-                // Listen to rotation changes and update positions
-                const listenerId = particle.rotation.addListener(({ value }) => {
-                    const angleRad = (value * Math.PI) / 180;
-                    setParticlePositions((prev) => ({
-                        ...prev,
-                        [particle.id]: {
-                            x: Math.cos(angleRad) * particle.distance,
-                            y: Math.sin(angleRad) * particle.distance,
-                        },
-                    }));
-                });
-
-                return { animation, listenerId, particle };
-            });
-
-            // Start all animations
-            animations.forEach(({ animation }) => animation.start());
-
-            return () => {
-                // Cleanup: stop all animations and remove listeners
-                animations.forEach(({ animation, listenerId, particle }) => {
-                    animation.stop();
-                    particle.rotation.removeListener(listenerId);
-                    particle.rotation.setValue(particle.initialAngle);
-                });
-            };
-        } else {
-            // Reset all particles when not active
-            particles.forEach((particle) => {
-                particle.rotation.stopAnimation();
-                particle.rotation.setValue(particle.initialAngle);
-            });
-            setParticlePositions({});
+        if (!isActive) {
+            setParticles([]);
+            return;
         }
-    }, [isActive, particles, circleSize]);
+
+        // Spawn particles at regular intervals
+        const spawnInterval = setInterval(() => {
+            const id = particleIdRef.current++;
+            
+            // Random position around circle perimeter
+            const angle = Math.random() * Math.PI * 2;
+            const radius = circleSize / 2;
+            const x = Math.cos(angle) * radius;
+            const y = Math.sin(angle) * radius;
+
+            const newParticle = {
+                id,
+                x,
+                y,
+                size: 3 + Math.random() * 5, // 3-8px
+                opacity: new Animated.Value(0.4 + Math.random() * 0.4), // 0.4-0.8
+                translateY: new Animated.Value(0),
+                translateX: new Animated.Value(0),
+                wobbleX: (Math.random() - 0.5) * 15, // ±15px wobble
+            };
+
+            setParticles(prev => [...prev, newParticle]);
+
+            // Animate particle upward and fade out (slower)
+            Animated.parallel([
+                // Float up and outward
+                Animated.timing(newParticle.translateY, {
+                    toValue: -200, // Move up 200px
+                    duration: 4000, // 4 seconds
+                    easing: Easing.out(Easing.ease),
+                    useNativeDriver: true,
+                }),
+                // Horizontal wobble
+                Animated.timing(newParticle.translateX, {
+                    toValue: newParticle.wobbleX,
+                    duration: 4000,
+                    easing: Easing.inOut(Easing.sine),
+                    useNativeDriver: true,
+                }),
+                // Fade out
+                Animated.timing(newParticle.opacity, {
+                    toValue: 0,
+                    duration: 4000,
+                    easing: Easing.out(Easing.ease),
+                    useNativeDriver: true,
+                }),
+            ]).start(() => {
+                // Remove particle after animation
+                setParticles(prev => prev.filter(p => p.id !== id));
+            });
+        }, SPAWN_RATE);
+
+        return () => {
+            clearInterval(spawnInterval);
+        };
+    }, [isActive, circleSize]);
 
     if (!isActive) return null;
 
     return (
-        <View style={[styles.container, { width: circleSize + 150, height: circleSize + 150 }]}>
-            {particles.map((particle) => {
-                const position = particlePositions[particle.id] || { x: 0, y: 0 };
-
-                return (
-                    <View
-                        key={particle.id}
-                        style={[
-                            styles.particle,
-                            {
-                                width: particle.size,
-                                height: particle.size,
-                                borderRadius: particle.size / 2,
-                                backgroundColor: particle.color,
-                                opacity: particle.opacity,
-                                left: '50%',
-                                top: '50%',
-                                marginLeft: position.x - particle.size /2,
-                                marginTop: position.y - particle.size / 2,
-                            },
-                        ]}
-                    />
-                );
-            })}
+        <View style={styles.container}>
+            {particles.map(particle => (
+                <Animated.View
+                    key={particle.id}
+                    style={[
+                        styles.particle,
+                        {
+                            width: particle.size,
+                            height: particle.size,
+                            borderRadius: particle.size / 2,
+                            backgroundColor: color,
+                            opacity: particle.opacity,
+                            left: '50%',
+                            top: '50%',
+                            marginLeft: particle.x - particle.size / 2,
+                            marginTop: particle.y - particle.size / 2,
+                            transform: [
+                                { translateY: particle.translateY },
+                                { translateX: particle.translateX },
+                            ],
+                        },
+                    ]}
+                />
+            ))}
         </View>
     );
 }
@@ -142,6 +109,8 @@ export default function ParticleEffect({ isActive, circleSize }) {
 const styles = StyleSheet.create({
     container: {
         position: 'absolute',
+        width: '100%',
+        height: '100%',
         alignItems: 'center',
         justifyContent: 'center',
     },
