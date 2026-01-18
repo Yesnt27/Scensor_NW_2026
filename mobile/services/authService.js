@@ -1,4 +1,4 @@
-import { auth } from '../config/firebase';
+import { initAuth, getAuthInstance } from '../config/firebase';
 import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
@@ -9,9 +9,19 @@ import { database } from '../config/firebase';
 import { ref, set, get } from 'firebase/database';
 
 class AuthService {
+    // Ensure auth is initialized before use
+    async ensureAuth() {
+        let auth = getAuthInstance();
+        if (!auth) {
+            auth = await initAuth();
+        }
+        return auth;
+    }
+
     // Sign up new user
     async signUp(email, password) {
         try {
+            const auth = await this.ensureAuth();
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
@@ -33,6 +43,7 @@ class AuthService {
     // Sign in existing user
     async signIn(email, password) {
         try {
+            const auth = await this.ensureAuth();
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             return userCredential.user;
         } catch (error) {
@@ -43,6 +54,7 @@ class AuthService {
     // Sign out
     async signOutUser() {
         try {
+            const auth = await this.ensureAuth();
             await signOut(auth);
         } catch (error) {
             throw error;
@@ -51,12 +63,20 @@ class AuthService {
 
     // Get current user
     getCurrentUser() {
+        const auth = getAuthInstance();
+        if (!auth) return null;
         return auth.currentUser;
     }
 
     // Listen to auth state changes
-    onAuthStateChange(callback) {
-        return onAuthStateChanged(auth, callback);
+    async onAuthStateChange(callback) {
+        try {
+            const auth = await this.ensureAuth();
+            return onAuthStateChanged(auth, callback);
+        } catch (error) {
+            console.error('Error setting up auth state listener:', error);
+            throw error;
+        }
     }
 
     // Create user profile in Firebase

@@ -57,7 +57,7 @@ export default function ParticleEffect({ isActive, circleSize, color = '#00FF88'
                     toValue: 0,
                     duration: 4000,
                     easing: Easing.out(Easing.quad), // ✅ Changed from Easing.ease
-                    useNativeDriver: true,
+                    useNativeDriver: false, // ❌ Opacity cannot use native driver
                 }),
             ]).start(() => {
                 setParticles(prev => prev.filter(p => p.id !== id));

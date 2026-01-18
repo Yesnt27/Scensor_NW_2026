@@ -27,7 +27,7 @@ export default function SensorCircle({ state = STATE_TYPES.NORMAL }) {
                         toValue: 1.15,
                         duration: 2500,
                         easing: Easing.inOut(Easing.ease),
-                        useNativeDriver: true, // ✅ Native (transform only)
+                        useNativeDriver: false, // ❌ Must match other animations on same view (non-native)
                     }),
                     Animated.timing(glowAnim, {
                         toValue: 50,
@@ -39,7 +39,7 @@ export default function SensorCircle({ state = STATE_TYPES.NORMAL }) {
                         toValue: 0.9,
                         duration: 2500,
                         easing: Easing.inOut(Easing.ease),
-                        useNativeDriver: true, // ✅ Native (opacity)
+                        useNativeDriver: false, // ✅ Non-native (opacity can't use native)
                     }),
                 ]),
                 // Exhale - contract
@@ -48,7 +48,7 @@ export default function SensorCircle({ state = STATE_TYPES.NORMAL }) {
                         toValue: 1,
                         duration: 2500,
                         easing: Easing.inOut(Easing.ease),
-                        useNativeDriver: true, // ✅ Native
+                        useNativeDriver: false, // ❌ Must match other animations on same view (non-native)
                     }),
                     Animated.timing(glowAnim, {
                         toValue: 20,
@@ -60,7 +60,7 @@ export default function SensorCircle({ state = STATE_TYPES.NORMAL }) {
                         toValue: 0.6,
                         duration: 2500,
                         easing: Easing.inOut(Easing.ease),
-                        useNativeDriver: true, // ✅ Native
+                        useNativeDriver: false, // ✅ Non-native (opacity can't use native)
                     }),
                 ]),
             ])

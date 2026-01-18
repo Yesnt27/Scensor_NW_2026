@@ -1,34 +1,44 @@
-import { initializeApp } from 'firebase/app';
+import { initializeApp, getApps } from 'firebase/app';
 import { getDatabase } from 'firebase/database';
-import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
-    apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
-    authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
-    databaseURL: process.env.EXPO_PUBLIC_FIREBASE_DATABASE_URL,
-    projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
-    storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
-    measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID
+  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  databaseURL: process.env.EXPO_PUBLIC_FIREBASE_DATABASE_URL,
+  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
 let app;
 let database;
-let auth;
+let auth = null;
 
-try {
-    if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "") {
-        app = initializeApp(firebaseConfig);
-        database = getDatabase(app);
-        auth = getAuth(app);
-        console.log('Firebase initialized successfully');
-    } else {
-        console.warn('⚠️ Firebase API key not configured. Please add your API key in config/firebase.js');
-    }
-} catch (error) {
-    console.error('Firebase initialization error:', error);
+// Initialize app and database immediately
+if (getApps().length === 0) {
+  app = initializeApp(firebaseConfig);
+} else {
+  app = getApps()[0];
 }
 
-export { database, auth };
-export default app;
+database = getDatabase(app);
+
+// Lazy load auth - only when first accessed
+const initAuth = async () => {
+  if (auth !== null) return auth;
+  
+  try {
+    const { getAuth } = await import('firebase/auth');
+    auth = getAuth(app);
+    console.log('[Firebase] Auth loaded');
+    return auth;
+  } catch (error) {
+    console.error('[Firebase] Failed to load auth:', error.message);
+    throw error;
+  }
+};
+
+export { database, app, initAuth };
+export const getAuthInstance = () => auth;
