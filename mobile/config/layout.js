@@ -4,6 +4,7 @@ export const LAYOUT_CONFIG = {
         borderRadius: 30,
         normalColor: '#00C25F',
         alertColor: '#FE0000',
+        detectingColor: '#FFFFFF',
     },
     sensorValue: {
         marginTop: 70,
@@ -18,7 +19,9 @@ export const LAYOUT_CONFIG = {
         threshold: 980000,
         normalColor: '#00DF82',
         alertColor: '#980000',
+        detectingColor: '#FFFFFF',
         outerColorNormal: '#00C25F',
         outerColorAlert: '#FE0000',
+        outerColorDetecting: '#b7b7b7',
     },
 };
