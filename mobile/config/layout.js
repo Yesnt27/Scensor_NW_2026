@@ -13,5 +13,8 @@ export const LAYOUT_CONFIG = {
     circle: {
         size: 225,
         innerSize: 165,
+        threshold: 980000,
+        normalColor: '#00DF82',
+        alertColor: '#FF0000',
     },
 };

@@ -3,15 +3,6 @@ import { View, Text } from 'react-native';
 import { database } from '../config/firebase';
 import { ref, onValue } from 'firebase/database';
 import { sensorScreenStyles } from '../styles/sensorScreenStyles';
-import SensorCircle from './SensorCircle';
-import CloudButton from './CloudButton';
-import BottomGradient from './BottomGradient';
-
-import React, { useState, useEffect } from 'react';
-import { View, Text } from 'react-native';
-import { database } from '../config/firebase';
-import { ref, onValue } from 'firebase/database';
-import { sensorScreenStyles } from '../styles/sensorScreenStyles';
 import { LAYOUT_CONFIG } from '../config/layout';
 import SensorCircle from './SensorCircle';
 import CloudButton from './CloudButton';
