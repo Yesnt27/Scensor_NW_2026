@@ -1,14 +1,17 @@
 /**
  * Custom Hook: useAlertState
- * Manages alert state logic based on sensor value and button press
- * Cycles through: normal → alert → detecting → normal
+ * Manages alert state logic based on VOC index
+ * 
+ * Logic:
+ * - VOC Index > 250: Alert state (red)
+ * - VOC Index = 0: Detecting state (white, pulsing)
+ * - VOC Index < 250 and > 0: Normal state (green)
  * 
  * Usage:
- *   const { state, toggleState, resetState } = useAlertState(sensorValue, threshold);
+ *   const { state, toggleState } = useAlertState(vocIndex);
  */
 
-import { useState, useMemo } from 'react';
-import { LAYOUT_CONFIG } from '../config/layout';
+import { useMemo } from 'react';
 
 // State types
 export const STATE_TYPES = {
@@ -17,41 +20,28 @@ export const STATE_TYPES = {
     DETECTING: 'Detecting...',
 };
 
-export function useAlertState(sensorValue, threshold = null) {
-    // Cycle through: 0 = normal, 1 = alert, 2 = detecting, then back to 0
-    const [buttonState, setButtonState] = useState(0);
-
-    // Use provided threshold or fall back to config
-    const alertThreshold = threshold ?? LAYOUT_CONFIG.circle.threshold;
-
-    // Determine current state
+export function useAlertState(vocIndex) {
+    // Determine current state based purely on VOC index
     const state = useMemo(() => {
-        // If button has been pressed, use button state
-        if (buttonState > 0) {
-            if (buttonState === 1) return STATE_TYPES.ALERT;
-            if (buttonState === 2) return STATE_TYPES.DETECTING;
+        if (vocIndex === 0) {
+            return STATE_TYPES.DETECTING;  // Sensor initializing or no reading
+        } else if (vocIndex > 250) {
+            return STATE_TYPES.ALERT;  // High VOC detected
+        } else {
+            return STATE_TYPES.NORMAL;  // Normal air quality
         }
-        // Otherwise, check if sensor value exceeds threshold
-        if (sensorValue >= alertThreshold) {
-            return STATE_TYPES.ALERT;
-        }
-        return STATE_TYPES.NORMAL;
-    }, [buttonState, sensorValue, alertThreshold]);
-
+    }, [vocIndex]);
+    
+    // Button function (currently does nothing, but kept for compatibility)
     const toggleState = () => {
-        setButtonState((prev) => (prev + 1) % 3); // Cycle: 0 → 1 → 2 → 0
+        // No-op: state is now purely determined by VOC index
+        console.log('Button pressed - state is auto-determined by VOC index');
     };
-
-    const resetState = () => {
-        setButtonState(0);
-    };
-
+    
     return {
         state,
         isAlert: state === STATE_TYPES.ALERT,
         isDetecting: state === STATE_TYPES.DETECTING,
-        toggleState,
-        resetState,
+        toggleState,  // Keep this so the button doesn't break
     };
 }
-
