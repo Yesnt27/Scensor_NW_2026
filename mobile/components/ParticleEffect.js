@@ -47,22 +47,22 @@ export default function ParticleEffect({ isActive, circleSize, color = '#00FF88'
                 Animated.timing(newParticle.translateY, {
                     toValue: -200, // Move up 200px
                     duration: 4000, // 4 seconds
-                    easing: Easing.out(Easing.ease),
-                    useNativeDriver: true,
+                    easing: Easing.out(Easing.cubic),
+                    useNativeDriver: false,
                 }),
                 // Horizontal wobble
                 Animated.timing(newParticle.translateX, {
                     toValue: newParticle.wobbleX,
                     duration: 4000,
-                    easing: Easing.inOut(Easing.sine),
-                    useNativeDriver: true,
+                    easing: Easing.inOut(Easing.sin),
+                    useNativeDriver: false,
                 }),
                 // Fade out
                 Animated.timing(newParticle.opacity, {
                     toValue: 0,
                     duration: 4000,
-                    easing: Easing.out(Easing.ease),
-                    useNativeDriver: true,
+                    easing: Easing.out(Easing.cubic),
+                    useNativeDriver: false,
                 }),
             ]).start(() => {
                 // Remove particle after animation

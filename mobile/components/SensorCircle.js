@@ -26,20 +26,20 @@ export default function SensorCircle({ state = STATE_TYPES.NORMAL }) {
                     Animated.timing(breatheAnim, {
                         toValue: 1.15, // Increased from 1.05 to 1.15 (115% scale)
                         duration: 2500,
-                        easing: Easing.inOut(Easing.ease),
-                        useNativeDriver: true,
+                        easing: Easing.inOut(Easing.cubic),
+                        useNativeDriver: false,
                     }),
                     Animated.timing(glowAnim, {
                         toValue: 50, // Increased from 35 to 50
                         duration: 2500,
-                        easing: Easing.inOut(Easing.ease),
+                        easing: Easing.inOut(Easing.cubic),
                         useNativeDriver: false,
                     }),
                     Animated.timing(glowOpacityAnim, {
                         toValue: 0.9, // Increased from 0.8 to 0.9
                         duration: 2500,
-                        easing: Easing.inOut(Easing.ease),
-                        useNativeDriver: true,
+                        easing: Easing.inOut(Easing.cubic),
+                        useNativeDriver: false,
                     }),
                 ]),
                 // Exhale - contract
@@ -47,20 +47,20 @@ export default function SensorCircle({ state = STATE_TYPES.NORMAL }) {
                     Animated.timing(breatheAnim, {
                         toValue: 1,
                         duration: 2500,
-                        easing: Easing.inOut(Easing.ease),
-                        useNativeDriver: true,
+                        easing: Easing.inOut(Easing.cubic),
+                        useNativeDriver: false,
                     }),
                     Animated.timing(glowAnim, {
                         toValue: 20,
                         duration: 2500,
-                        easing: Easing.inOut(Easing.ease),
+                        easing: Easing.inOut(Easing.cubic),
                         useNativeDriver: false,
                     }),
                     Animated.timing(glowOpacityAnim, {
                         toValue: 0.6,
                         duration: 2500,
-                        easing: Easing.inOut(Easing.ease),
-                        useNativeDriver: true,
+                        easing: Easing.inOut(Easing.cubic),
+                        useNativeDriver: false,
                     }),
                 ]),
             ])

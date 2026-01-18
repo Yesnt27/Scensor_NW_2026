@@ -31,7 +31,7 @@ export default function App() {
         Animated.timing(fadeAnim, {
             toValue: 0,
             duration: 150,
-            useNativeDriver: true,
+            useNativeDriver: false,
         }).start(() => {
             // Change screen
             setShowTrends(showTrendsScreen);
@@ -39,7 +39,7 @@ export default function App() {
             Animated.timing(fadeAnim, {
                 toValue: 1,
                 duration: 150,
-                useNativeDriver: true,
+                useNativeDriver: false,
             }).start();
         });
     };
