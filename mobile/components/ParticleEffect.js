@@ -11,7 +11,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, Animated, Easing } from 'react-native';
 
-const PARTICLE_COUNT = 80;
+const PARTICLE_COUNT = 200;
 const PARTICLE_COLORS = [
     '#FFFFFF', '#F5F5F5', '#E8E8E8', '#DCDCDC', '#D0D0D0',
     '#C0C0C0', '#B0B0B0', '#A0A0A0', '#909090', '#808080',
@@ -128,7 +128,7 @@ export default function ParticleEffect({ isActive, circleSize }) {
                                 opacity: particle.opacity,
                                 left: '50%',
                                 top: '50%',
-                                marginLeft: position.x - particle.size / 2,
+                                marginLeft: position.x - particle.size /2,
                                 marginTop: position.y - particle.size / 2,
                             },
                         ]}

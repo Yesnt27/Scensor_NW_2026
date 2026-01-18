@@ -38,7 +38,7 @@ export const sensorScreenStyles = StyleSheet.create({
         fontSize: LAYOUT_CONFIG.sensorValue.fontSize,
         fontWeight: '500',
         position: 'absolute',
-        bottom: 200, // Moved up from 150
+        bottom: 160,
         alignSelf: 'center',
     },
 });
