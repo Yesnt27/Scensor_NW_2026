@@ -49,6 +49,19 @@ const baseStyles = StyleSheet.create({
         fontSize: 18,
         fontWeight: '400',
     },
+    detectingContainer: {
+        position: 'absolute',
+        bottom: 145, // Position below the circle
+        left: 0,
+        right: 0,
+        alignItems: 'center',
+    },
+    detectingText: {
+        fontFamily: FONT_FAMILY,
+        color: '#FFFFFF',
+        fontSize: 22,
+        fontWeight: '400',
+    },
 });
 
 // Function to get responsive styles based on screen size
